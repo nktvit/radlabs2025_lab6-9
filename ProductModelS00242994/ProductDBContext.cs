@@ -37,7 +37,7 @@ namespace ProductModel
             // You must build the project before calling Add-migration
             if (!inProduction)
             {
-                Product[] products = DBHelper.Get<Product>(@"..\ProductModelS00242994\Products.csv").ToArray();
+                Product[] products = DBHelper.Get<Product>(@"../ProductModelS00242994/Products.csv").ToArray();
                 modelBuilder.Entity<Product>().HasData(products);
             }
             //modelBuilder.Entity<Product>().HasData(
