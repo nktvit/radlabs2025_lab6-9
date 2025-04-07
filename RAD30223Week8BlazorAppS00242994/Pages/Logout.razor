@@ -1,0 +1,22 @@
+@page "/logout"
+@inject AppState AppState
+@inject ILocalStorageService LocalStorageService
+@inject NavigationManager NavigationManager
+@inject IToastService ToastService
+@inject IHttpClientService HttpClientService
+@using BlazorDataServices
+@using DataServices
+
+<h3>Logging out...</h3>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await LocalStorageService.RemoveItem("token");
+        HttpClientService.UserToken = null;
+        AppState.LoggedIn = false;
+        
+        ToastService.ShowSuccess("You have been logged out successfully.");
+        NavigationManager.NavigateTo("/");
+    }
+}

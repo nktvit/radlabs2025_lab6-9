@@ -1,0 +1,86 @@
+@page "/grndetails/{GrnId:int}"
+@inject IHttpClientService HttpClientService
+@inject NavigationManager NavigationManager
+@inject IToastService ToastService
+@attribute [Authorize(Roles = "Store Manager")]
+@using DataServices
+@using Microsoft.AspNetCore.Authorization
+
+<h3>GRN Details</h3>
+
+@if (grn == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="card mb-4">
+        <div class="card-header">
+            <h4>GRN #@grn.GrnID</h4>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <p><strong>Order Date:</strong> @grn.OrderDate.ToShortDateString()</p>
+                </div>
+                <div class="col-md-4">
+                    <p><strong>Delivery Date:</strong> @(grn.DeliveryDate.HasValue ? grn.DeliveryDate.Value.ToShortDateString() : "Not Delivered")</p>
+                </div>
+                <div class="col-md-4">
+                    <p><strong>Stock Updated:</strong> @(grn.StockUpdated ? "Yes" : "No")</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h4>GRN Lines</h4>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Line ID</th>
+                <th>Product</th>
+                <th>Quantity Delivered</th>
+                <th>Unit Price</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var line in grn.GRNLines)
+            {
+                <tr>
+                    <td>@line.LineID</td>
+                    <td>@line.associatedProduct.Description</td>
+                    <td>@line.QtyDelivered</td>
+                    <td>@line.associatedProduct.UnitPrice.ToString("C")</td>
+                    <td>@((line.QtyDelivered * line.associatedProduct.UnitPrice).ToString("C"))</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <button class="btn btn-secondary" @onclick="GoBack">Back to List</button>
+}
+
+@code {
+    [Parameter]
+    public int GrnId { get; set; }
+
+    private GRN grn;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            grn = await HttpClientService.getSingle<GRN>("api/GRN/", GrnId);
+        }
+        catch (Exception ex)
+        {
+            ToastService.ShowError($"Error loading GRN details: {ex.Message}");
+        }
+    }
+
+    private void GoBack()
+    {
+        NavigationManager.NavigateTo("/grnlist");
+    }
+}

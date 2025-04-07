@@ -1,0 +1,62 @@
+@page "/grnlist"
+@inject IHttpClientService HttpClientService
+@inject NavigationManager NavigationManager
+@inject IToastService ToastService
+@attribute [Authorize(Roles = "Store Manager")]
+@using DataServices
+
+<h3>GRN List</h3>
+
+@if (grns == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>GRN ID</th>
+                <th>Order Date</th>
+                <th>Delivery Date</th>
+                <th>Stock Updated</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var grn in grns)
+            {
+                <tr>
+                    <td>@grn.GrnID</td>
+                    <td>@grn.OrderDate.ToShortDateString()</td>
+                    <td>@(grn.DeliveryDate.HasValue ? grn.DeliveryDate.Value.ToShortDateString() : "Not Delivered")</td>
+                    <td>@(grn.StockUpdated ? "Yes" : "No")</td>
+                    <td>
+                        <button class="btn btn-primary" @onclick="() => ViewDetails(grn.GrnID)">View Details</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<GRN> grns;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            grns = await HttpClientService.getCollection<GRN>("api/GRN");
+        }
+        catch (Exception ex)
+        {
+            ToastService.ShowError($"Error loading GRNs: {ex.Message}");
+        }
+    }
+
+    private void ViewDetails(int grnId)
+    {
+        NavigationManager.NavigateTo($"/grndetails/{grnId}");
+    }
+}

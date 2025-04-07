@@ -10,6 +10,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using BlazorDataServices;
 using ViewModels;
 
 namespace DataServices
@@ -101,7 +102,7 @@ namespace DataServices
             _httpClient.DefaultRequestHeaders.Add("Accept", "*/*");
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             var content = new LoginViewModel { Username = username, Password = password, RememberMe = true };
-            var result = await _httpClient.PostAsJsonAsync("Token", content);
+            var result = await _httpClient.PostAsJsonAsync("api/Account/Token", content);
             try
             {
                 var resultContent = result.Content.ReadAsAsync<Token>(
