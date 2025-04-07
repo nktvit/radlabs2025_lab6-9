@@ -1,7 +1,8 @@
 ﻿using System.Timers;
+using BlazorToastNotifications.Services;
 using Timer = System.Timers.Timer;
 
-namespace BlazorToastNotifications.Services;
+namespace BlazorDataServices;
 
 public class ToastService : IDisposable
 {

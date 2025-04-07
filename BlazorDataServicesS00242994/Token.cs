@@ -5,11 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DataServices
+namespace BlazorDataServices
 {
     public class Token
     {
-        [JsonProperty("token")]
+        [JsonProperty("access_token")]
         public string AccessToken { get; set; }
 
         [JsonProperty("expiration")]
