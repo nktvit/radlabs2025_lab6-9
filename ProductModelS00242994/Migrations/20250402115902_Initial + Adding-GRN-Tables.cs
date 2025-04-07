@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -7,26 +8,68 @@
 namespace ProductModel.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class InitialAddingGRNTables : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "GRNs",
+                columns: table => new
+                {
+                    GrnID = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    OrderDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    DeliveryDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    StockUpdated = table.Column<bool>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GRNs", x => x.GrnID);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Products",
                 columns: table => new
                 {
-                    ID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ReorderLevel = table.Column<int>(type: "int", nullable: false),
-                    ReorderQuantity = table.Column<int>(type: "int", nullable: false),
-                    UnitPrice = table.Column<double>(type: "float", nullable: false),
-                    StockOnHand = table.Column<int>(type: "int", nullable: false)
+                    ID = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Description = table.Column<string>(type: "TEXT", nullable: true),
+                    ReorderLevel = table.Column<int>(type: "INTEGER", nullable: false),
+                    ReorderQuantity = table.Column<int>(type: "INTEGER", nullable: false),
+                    UnitPrice = table.Column<double>(type: "REAL", nullable: false),
+                    StockOnHand = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Products", x => x.ID);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "GRNLines",
+                columns: table => new
+                {
+                    LineID = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    GrnID = table.Column<int>(type: "INTEGER", nullable: false),
+                    StockID = table.Column<int>(type: "INTEGER", nullable: false),
+                    QtyDelivered = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GRNLines", x => x.LineID);
+                    table.ForeignKey(
+                        name: "FK_GRNLines_GRNs_GrnID",
+                        column: x => x.GrnID,
+                        principalTable: "GRNs",
+                        principalColumn: "GrnID",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_GRNLines_Products_StockID",
+                        column: x => x.StockID,
+                        principalTable: "Products",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.InsertData(
@@ -80,11 +123,27 @@ namespace ProductModel.Migrations
                     { 44, "Vegetable Soup", 100, 1, 4, 9.0 },
                     { 45, "Chicken Soup", 100, 1, 2, 8.0 }
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GRNLines_GrnID",
+                table: "GRNLines",
+                column: "GrnID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GRNLines_StockID",
+                table: "GRNLines",
+                column: "StockID");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "GRNLines");
+
+            migrationBuilder.DropTable(
+                name: "GRNs");
+
             migrationBuilder.DropTable(
                 name: "Products");
         }
